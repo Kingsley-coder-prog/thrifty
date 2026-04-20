@@ -1,19 +1,22 @@
 import crypto from "crypto";
 import { env } from "../config/env.js";
 
-const KEY = Buffer.from(env.ENCRYPTION_KEY, "hex"); // 32 bytes
+const KEY = Buffer.from(env.ENCRYPTION_KEY, "hex");
 const ALG = "aes-256-gcm";
-const IV_LENGTH = 12; // 96 bits — recommended for GCM
-const TAG_LENGTH = 16; // 128 bits — GCM auth tag
+const IV_LENGTH = 12;
+const TAG_LENGTH = 16;
 
 /**
- * Randomised encryption — each call produces different ciphertext.
- * Use for fields that are never used as lookup keys: full_name.
+ * Randomised encryption.
+ * Every call generates a fresh IV so identical plaintexts
+ * produce different ciphertext each time.
  *
- * Format stored in DB: base64(iv[12] + tag[16] + ciphertext)
+ * Use for: full_name (never used as a DB lookup key)
+ *
+ * Stored format: base64( iv[12] + tag[16] + ciphertext )
  */
 export function encrypt(plaintext) {
-  if (!plaintext) return null;
+  if (plaintext === null || plaintext === undefined) return null;
 
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALG, KEY, iv);
@@ -28,10 +31,11 @@ export function encrypt(plaintext) {
 }
 
 /**
- * Decrypt a value encrypted with encrypt().
+ * Decrypt a value produced by encrypt() or encryptDeterministic().
+ * Both functions store data in the same format: iv + tag + ciphertext.
  */
 export function decrypt(encoded) {
-  if (!encoded) return null;
+  if (encoded === null || encoded === undefined) return null;
 
   const buf = Buffer.from(encoded, "base64");
   const iv = buf.subarray(0, IV_LENGTH);
@@ -45,18 +49,20 @@ export function decrypt(encoded) {
 }
 
 /**
- * Deterministic encryption — same plaintext always produces same ciphertext.
- * Required for fields used in WHERE clauses or UNIQUE constraints: phone_number, email.
+ * Deterministic encryption.
+ * Same plaintext always produces the same ciphertext — required for
+ * columns used in WHERE clauses and UNIQUE constraints.
  *
- * Uses a fixed IV derived from the key — acceptable tradeoff for lookup columns.
- * Do NOT use for free-text fields where value uniqueness matters for security.
+ * Use for: phone_number, email
  *
- * Format stored in DB: base64(ciphertext) — no IV prefix needed (it's fixed)
+ * Uses a fixed IV derived from the key. Stores the auth tag in the
+ * same format as encrypt() so the same decrypt() function works on both.
+ *
+ * Stored format: base64( iv[12] + tag[16] + ciphertext )
  */
 export function encryptDeterministic(plaintext) {
-  if (!plaintext) return null;
+  if (plaintext === null || plaintext === undefined) return null;
 
-  // derive a fixed 12-byte IV from the key itself
   const iv = crypto
     .createHash("sha256")
     .update(KEY)
@@ -64,17 +70,27 @@ export function encryptDeterministic(plaintext) {
     .subarray(0, IV_LENGTH);
 
   const cipher = crypto.createCipheriv(ALG, KEY, iv);
+
   const encrypted = Buffer.concat([
     cipher.update(String(plaintext).toLowerCase(), "utf8"),
     cipher.final(),
   ]);
+  const tag = cipher.getAuthTag();
 
-  return encrypted.toString("base64");
+  return Buffer.concat([iv, tag, encrypted]).toString("base64");
 }
 
 /**
- * Hash a value with SHA-256 — for non-sensitive deduplication checks.
- * Not suitable for passwords or BVNs (use Argon2id for those).
+ * Alias for decrypt() — use when decrypting deterministically encrypted values.
+ * Kept separate for code clarity so it's obvious which encrypt function was used.
+ */
+export function decryptDeterministic(encoded) {
+  return decrypt(encoded);
+}
+
+/**
+ * SHA-256 hash — for fast deduplication lookups (BVN fingerprint, token fingerprint).
+ * Not suitable for passwords — use Argon2id for those.
  */
 export function sha256(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");

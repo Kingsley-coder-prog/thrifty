@@ -5,6 +5,7 @@ import { env } from "./config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { logger } from "./lib/logger.js";
 import { authRouter } from "./routes/auth.routes.js";
+import { userRouter } from "./routes/user.routes.js";
 
 export function createApp() {
   const app = express();
@@ -38,7 +39,7 @@ export function createApp() {
   });
 
   app.use("/auth", authRouter);
-  // app.use('/users',  userRouter)   — Phase 4
+  app.use("/users", userRouter);
   // app.use('/groups', groupRouter)  — Phase 5
   // app.use('/admin',  adminRouter)  — Phase 8
 
