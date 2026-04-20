@@ -1,0 +1,431 @@
+{
+  "info": {
+    "name": "Thrifty API",
+    "description": "Thrifty cooperative savings platform API collection.\n\n**Setup:**\n1. Import this collection\n2. Import `thrifty.postman_environment.json`\n3. Select the `Thrifty Local` environment\n4. Run `Auth / Register` then `Auth / Login` — tokens are saved automatically\n5. All subsequent requests use the saved token automatically\n\n**Build order to test:**\nAuth → Users → Groups → Debits & Payouts → Admin",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const d = pm.response.json();",
+                  "  pm.environment.set('accessToken', d.accessToken);",
+                  "  pm.environment.set('refreshToken', d.refreshToken);",
+                  "  pm.environment.set('userId', d.user.id);",
+                  "  pm.test('Register successful', () => pm.expect(pm.response.code).to.eql(201));",
+                  "  pm.test('Access token present', () => pm.expect(d.accessToken).to.be.a('string'));",
+                  "  pm.test('Refresh token present', () => pm.expect(d.refreshToken).to.be.a('string'));",
+                  "  pm.test('User ID present', () => pm.expect(d.user.id).to.be.a('string'));",
+                  "  console.log('Tokens saved to environment automatically');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test User\",\n  \"phone\": \"08012345678\",\n  \"bvn\": \"12345678901\",\n  \"password\": \"Test@1234\",\n  \"pin\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const d = pm.response.json();",
+                  "  pm.environment.set('accessToken', d.accessToken);",
+                  "  pm.environment.set('refreshToken', d.refreshToken);",
+                  "  pm.environment.set('userId', d.user.id);",
+                  "  pm.test('Login successful', () => pm.expect(pm.response.code).to.eql(200));",
+                  "  pm.test('Access token present', () => pm.expect(d.accessToken).to.be.a('string'));",
+                  "  pm.test('Refresh token present', () => pm.expect(d.refreshToken).to.be.a('string'));",
+                  "  console.log('Tokens saved — userId: ' + d.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"08012345678\",\n  \"password\": \"Test@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const d = pm.response.json();",
+                  "  pm.environment.set('accessToken', d.accessToken);",
+                  "  pm.environment.set('refreshToken', d.refreshToken);",
+                  "  pm.test('Token refreshed', () => pm.expect(pm.response.code).to.eql(200));",
+                  "  pm.test('New access token present', () => pm.expect(d.accessToken).to.be.a('string'));",
+                  "  console.log('Tokens rotated and saved to environment');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/refresh",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set('accessToken', '');",
+                  "  pm.environment.set('refreshToken', '');",
+                  "  pm.test('Logout successful', () => pm.expect(pm.response.code).to.eql(200));",
+                  "  console.log('Tokens cleared from environment');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\",\n  \"logoutAll\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout All Devices",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set('accessToken', '');",
+                  "  pm.environment.set('refreshToken', '');",
+                  "  pm.test('All sessions revoked', () => pm.expect(pm.response.code).to.eql(200));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"logoutAll\": true\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "👤 Users",
+      "description": "Phase 4 — wired in once user routes are built",
+      "item": [
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/me",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Updated Name\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Bank Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const d = pm.response.json();",
+                  "  pm.environment.set('bankAccountId', d.bankAccount.id);",
+                  "  pm.test('Bank account added', () => pm.expect(pm.response.code).to.eql(201));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Transaction-Pin", "value": "123456" }
+            ],
+            "url": "{{baseUrl}}/users/me/bank-accounts",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountNumber\": \"0123456789\",\n  \"bankCode\": \"058\",\n  \"bankName\": \"GTBank\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Bank Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/users/me/bank-accounts"
+          }
+        },
+        {
+          "name": "Set Primary Bank Account",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Transaction-Pin", "value": "123456" }
+            ],
+            "url": "{{baseUrl}}/users/me/bank-accounts/{{bankAccountId}}/primary",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "👥 Groups",
+      "description": "Phase 5 — wired in once group routes are built",
+      "item": [
+        {
+          "name": "Get All Tiers",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/groups/tiers"
+          }
+        },
+        {
+          "name": "Browse Open Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/groups?tierId={{tierId}}",
+              "query": [
+                { "key": "tierId", "value": "{{tierId}}", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Join Group",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const d = pm.response.json();",
+                  "  pm.environment.set('groupId', d.groupId);",
+                  "  pm.test('Joined group', () => pm.expect(pm.response.code).to.eql(200));",
+                  "  console.log('Group ID saved: ' + d.groupId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Transaction-Pin", "value": "123456" }
+            ],
+            "url": "{{baseUrl}}/groups/join",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tierId\": \"{{tierId}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Group Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "💰 Contributions & Payouts",
+      "description": "Phase 6 — wired in once debit and payout engine is built",
+      "item": [
+        {
+          "name": "Get My Contributions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/contributions"
+          }
+        },
+        {
+          "name": "Get Cycle Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/cycles/current"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "🛡️ Admin",
+      "description": "Phase 8 — admin console endpoints",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=20",
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Groups",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/admin/groups"
+          }
+        },
+        {
+          "name": "Freeze User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{userId}}/freeze",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Suspicious activity detected\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Freeze Group",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/admin/groups/{{groupId}}/freeze",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Fraud investigation\"\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "✅ Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    }
+  ]
+}
