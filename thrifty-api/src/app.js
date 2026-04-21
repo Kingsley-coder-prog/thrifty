@@ -6,6 +6,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { logger } from "./lib/logger.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
+import { groupRouter } from "./routes/group.routes.js";
 
 export function createApp() {
   const app = express();
@@ -40,8 +41,8 @@ export function createApp() {
 
   app.use("/auth", authRouter);
   app.use("/users", userRouter);
-  // app.use('/groups', groupRouter)  — Phase 5
-  // app.use('/admin',  adminRouter)  — Phase 8
+  app.use("/groups", groupRouter);
+  // app.use('/admin', adminRouter)  — Phase 8
 
   app.use((req, res) => {
     res.status(404).json({ error: "NOT_FOUND" });
