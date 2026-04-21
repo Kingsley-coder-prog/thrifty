@@ -7,6 +7,7 @@ import { logger } from "./lib/logger.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { groupRouter } from "./routes/group.routes.js";
+import { webhookRouter } from "./routes/webhook.routes.js";
 
 export function createApp() {
   const app = express();
@@ -33,12 +34,33 @@ export function createApp() {
     }),
   );
 
+  // ── Webhooks — raw body BEFORE json parser ──────────────────────
+  // Paystack HMAC verification requires the raw request body buffer.
+  // Once express.json() runs, the raw buffer is gone.
+  app.use(
+    "/webhooks",
+    express.raw({ type: "application/json" }),
+    webhookRouter,
+  );
+
+  // ── Body parser for all other routes ───────────────────────────
   app.use(express.json({ limit: "50kb" }));
 
+  // ── Health check ────────────────────────────────────────────────
   app.get("/health", (req, res) => {
     res.json({ status: "ok", env: env.NODE_ENV });
   });
 
+  // ── Development only — manually trigger debit cycle ─────────────
+  if (env.NODE_ENV === "development") {
+    app.post("/dev/trigger-debits", async (req, res) => {
+      const { triggerDebitsNow } = await import("./jobs/scheduler.js");
+      await triggerDebitsNow();
+      res.json({ message: "Debit jobs enqueued" });
+    });
+  }
+
+  // ── API routes ───────────────────────────────────────────────────
   app.use("/auth", authRouter);
   app.use("/users", userRouter);
   app.use("/groups", groupRouter);
