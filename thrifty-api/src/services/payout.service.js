@@ -4,6 +4,7 @@ import { paystack } from "../lib/paystack.js";
 import { auditLog, AuditEvent } from "../lib/audit.js";
 import { logger } from "../lib/logger.js";
 import { cycleService } from "./cycle.service.js";
+import { notificationService } from "./notification.service.js";
 
 export const payoutService = {
   /**
@@ -239,6 +240,23 @@ export const payoutService = {
       target_id: payout.id,
       target_type: "payout",
       payload: { simulated: true },
+    });
+
+    await notificationService.notifyPayoutCompleted(payout.recipient_user_id, {
+      amount: payout.net_amount,
+      cycleNumber: (
+        await db("cycles")
+          .where({ id: payout.cycle_id })
+          .select("cycle_number")
+          .first()
+      ).cycle_number,
+      groupId: (
+        await db("cycles")
+          .join("thrift_groups", "thrift_groups.id", "cycles.group_id")
+          .where({ "cycles.id": payout.cycle_id })
+          .select("thrift_groups.id")
+          .first()
+      ).id,
     });
 
     logger.info({ payoutId: payout.id }, "Payout simulated (dev mode)");
