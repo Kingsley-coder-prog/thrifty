@@ -8,6 +8,7 @@ import { authRouter } from "./routes/auth.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { groupRouter } from "./routes/group.routes.js";
 import { webhookRouter } from "./routes/webhook.routes.js";
+import { adminRouter } from "./routes/admin.routes.js";
 
 export function createApp() {
   const app = express();
@@ -64,7 +65,9 @@ export function createApp() {
   app.use("/auth", authRouter);
   app.use("/users", userRouter);
   app.use("/groups", groupRouter);
-  // app.use('/admin', adminRouter)  — Phase 8
+  app.use("/admin", adminRouter);
+
+  // ── 404 handler ─────────────────────────────────────────────────
 
   app.use((req, res) => {
     res.status(404).json({ error: "NOT_FOUND" });
