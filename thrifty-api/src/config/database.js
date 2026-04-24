@@ -8,7 +8,7 @@ export const db = knex({
     connectionString: env.DATABASE_URL,
     ssl:
       env.NODE_ENV === "production"
-        ? { rejectUnauthorized: true }
+        ? { rejectUnauthorized: false }
         : env.NODE_ENV === "staging"
         ? { rejectUnauthorized: false }
         : false,
