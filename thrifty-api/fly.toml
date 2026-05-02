@@ -1,0 +1,29 @@
+# fly.toml - Thrifty Worker Configuration
+
+app = "thrifty-worker"
+primary_region = "fra"  # Frankfurt — closest to Nigeria
+
+[build]
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+
+# Worker process — no HTTP server needed
+# Fly requires at least one process defined
+[processes]
+  worker = "npm run worker:prod"
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
+
+# No HTTP service needed for a background worker
+# but Fly requires a health check — we use a minimal one
+[checks]
+  [checks.alive]
+    type = "tcp"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
