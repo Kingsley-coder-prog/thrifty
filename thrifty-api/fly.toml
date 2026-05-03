@@ -1,4 +1,5 @@
 # fly.toml - Thrifty Worker Configuration
+# Documentation: https://fly.io/docs/reference/configuration/
 
 app = "thrifty-worker"
 primary_region = "fra"
