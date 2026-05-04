@@ -1,5 +1,6 @@
 # fly.toml - Thrifty Worker Configuration
 # Documentation: https://fly.io/docs/reference/configuration/
+# This file is used to configure the deployment of the Thrifty Worker on Fly.io. It specifies the application name, primary region, build settings, environment variables, processes, and virtual machine resources.
 
 app = "thrifty-worker"
 primary_region = "fra"
