@@ -23,10 +23,7 @@ const client = axios.create({
  */
 export async function verifyBVN(bvn) {
   // dev mock — bypass real API call when using placeholder key
-  if (
-    env.NODE_ENV === "development" &&
-    env.BVN_PROVIDER_KEY === "placeholder"
-  ) {
+  if (env.BVN_PROVIDER_KEY === "placeholder") {
     logger.warn("BVN verification bypassed — using mock data in development");
     return {
       bvn,
