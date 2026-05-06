@@ -21,10 +21,12 @@ const schema = z.object({
   // ── JWT ───────────────────────────────────────────────────────
   JWT_PRIVATE_KEY: z
     .string()
-    .min(100, "JWT_PRIVATE_KEY looks too short — paste the full PEM"),
+    .min(100, "JWT_PRIVATE_KEY looks too short — paste the full PEM")
+    .transform((v) => v.replace(/\\n/g, "\n")),
   JWT_PUBLIC_KEY: z
     .string()
-    .min(100, "JWT_PUBLIC_KEY looks too short — paste the full PEM"),
+    .min(100, "JWT_PUBLIC_KEY looks too short — paste the full PEM")
+    .transform((v) => v.replace(/\\n/g, "\n")),
   JWT_ACCESS_EXPIRY: z.string().default("15m"),
   JWT_REFRESH_EXPIRY: z.string().default("30d"),
 
