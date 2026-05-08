@@ -125,12 +125,17 @@ export const userService = {
       .first();
     const existingCount = parseInt(countResult.count);
 
+    // create Paystack transfer recipient — required for payouts
+    const accountToken = await createTransferRecipient({
+      accountNumber,
+      bankCode,
+      accountName,
+    });
+
     const [account] = await db("bank_accounts")
       .insert({
         user_id: userId,
-        account_token: `tok_${bankCode}_${crypto
-          .randomBytes(16)
-          .toString("hex")}`,
+        account_token: accountToken,
         bank_code: bankCode,
         bank_name: bankName,
         account_name: accountName,
@@ -209,6 +214,37 @@ async function resolveAccountName(accountNumber, bankCode) {
     throw new AppError("ACCOUNT_RESOLUTION_FAILED", 422, {
       message:
         "Could not verify account details. Check the account number and bank code.",
+    });
+  }
+}
+
+async function createTransferRecipient({
+  accountNumber,
+  bankCode,
+  accountName,
+}) {
+  // in development, generate a placeholder token
+  if (process.env.NODE_ENV === "development") {
+    return `tok_${bankCode}_${crypto.randomBytes(16).toString("hex")}`;
+  }
+
+  // in production, create a real Paystack transfer recipient
+  try {
+    const { paystack } = await import("../lib/paystack.js");
+    const recipient = await paystack.createTransferRecipient({
+      accountNumber,
+      bankCode,
+      accountName,
+    });
+    return recipient.recipient_code;
+  } catch (err) {
+    logger.error(
+      { err, bankCode },
+      "Failed to create Paystack transfer recipient",
+    );
+    throw new AppError("RECIPIENT_CREATION_FAILED", 422, {
+      message:
+        "Could not register bank account with payment provider. Please try again.",
     });
   }
 }
