@@ -203,9 +203,13 @@ export const userService = {
 };
 
 async function resolveAccountName(accountNumber, bankCode) {
-  if (process.env.NODE_ENV === "development") {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.PAYSTACK_SECRET_KEY?.startsWith("sk_test_")
+  ) {
     return "Test Account Name";
   }
+
   try {
     const { paystack } = await import("../lib/paystack.js");
     const result = await paystack.resolveAccount({ accountNumber, bankCode });
