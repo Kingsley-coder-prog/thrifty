@@ -228,7 +228,10 @@ async function createTransferRecipient({
   accountName,
 }) {
   // in development, generate a placeholder token
-  if (process.env.NODE_ENV === "development") {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.PAYSTACK_SECRET_KEY?.startsWith("sk_test_")
+  ) {
     return `tok_${bankCode}_${crypto.randomBytes(16).toString("hex")}`;
   }
 
