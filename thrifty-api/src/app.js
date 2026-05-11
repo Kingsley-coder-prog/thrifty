@@ -9,6 +9,7 @@ import { userRouter } from "./routes/user.routes.js";
 import { groupRouter } from "./routes/group.routes.js";
 import { webhookRouter } from "./routes/webhook.routes.js";
 import { adminRouter } from "./routes/admin.routes.js";
+import { adminAuthRouter } from "./routes/admin.auth.routes.js";
 
 export function createApp() {
   const app = express();
@@ -35,24 +36,20 @@ export function createApp() {
     }),
   );
 
-  // ── Webhooks — raw body BEFORE json parser ──────────────────────
-  // Paystack HMAC verification requires the raw request body buffer.
-  // Once express.json() runs, the raw buffer is gone.
+  // webhooks need raw body BEFORE json parser
   app.use(
     "/webhooks",
     express.raw({ type: "application/json" }),
     webhookRouter,
   );
 
-  // ── Body parser for all other routes ───────────────────────────
   app.use(express.json({ limit: "50kb" }));
 
-  // ── Health check ────────────────────────────────────────────────
   app.get("/health", (req, res) => {
     res.json({ status: "ok", env: env.NODE_ENV });
   });
 
-  // ── Development only — manually trigger debit cycle ─────────────
+  // dev only
   if (env.NODE_ENV === "development") {
     app.post("/dev/trigger-debits", async (req, res) => {
       const { triggerDebitsNow } = await import("./jobs/scheduler.js");
@@ -61,13 +58,11 @@ export function createApp() {
     });
   }
 
-  // ── API routes ───────────────────────────────────────────────────
   app.use("/auth", authRouter);
   app.use("/users", userRouter);
   app.use("/groups", groupRouter);
-  app.use("/admin", adminRouter);
-
-  // ── 404 handler ─────────────────────────────────────────────────
+  app.use("/admin/auth", adminAuthRouter); // public — no adminAuth middleware
+  app.use("/admin", adminRouter); // protected — adminAuth applied in router
 
   app.use((req, res) => {
     res.status(404).json({ error: "NOT_FOUND" });

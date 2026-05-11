@@ -4,6 +4,11 @@ import { auditLog, AuditEvent } from "../lib/audit.js";
 import { notificationService } from "./notification.service.js";
 import { AppError, ErrorCode } from "../lib/errors.js";
 import { logger } from "../lib/logger.js";
+import argon2 from "argon2";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { env } from "../config/env.js";
+import { sha256 } from "../lib/crypto.js";
 
 export const adminService = {
   // ── Dashboard metrics ──────────────────────────────────────────
@@ -570,6 +575,135 @@ export const adminService = {
         total: parseInt(count),
         totalPages: Math.ceil(parseInt(count) / limit),
       },
+    };
+  },
+
+  // ── Admin authentication ───────────────────────────────────────
+
+  async login({ email, password, ipAddress, userAgent }) {
+    // find admin by email
+    const admin = await db("admins")
+      .where({ email: email.toLowerCase(), is_active: true })
+      .first();
+
+    if (!admin) {
+      throw new AppError("ADMIN_INVALID_CREDENTIALS", 401, {
+        message: "Invalid email or password.",
+      });
+    }
+
+    // check if account is locked
+    if (admin.locked_until && new Date(admin.locked_until) > new Date()) {
+      throw new AppError("ADMIN_ACCOUNT_LOCKED", 401, {
+        message:
+          "Account temporarily locked due to failed login attempts. Try again later.",
+      });
+    }
+
+    // verify password
+    const valid = await argon2.verify(admin.password_hash, password);
+
+    if (!valid) {
+      // increment failed attempts
+      const attempts = admin.failed_login_attempts + 1;
+      const lockedUntil =
+        attempts >= 5
+          ? new Date(Date.now() + 15 * 60 * 1000) // lock for 15 minutes
+          : null;
+
+      await db("admins").where({ id: admin.id }).update({
+        failed_login_attempts: attempts,
+        locked_until: lockedUntil,
+      });
+
+      throw new AppError("ADMIN_INVALID_CREDENTIALS", 401, {
+        message: "Invalid email or password.",
+      });
+    }
+
+    // reset failed attempts on success
+    await db("admins").where({ id: admin.id }).update({
+      failed_login_attempts: 0,
+      locked_until: null,
+      last_login_at: new Date(),
+    });
+
+    // generate token
+    const token = crypto.randomBytes(48).toString("hex");
+    const tokenHash = await argon2.hash(token);
+    const tokenFingerprint = sha256(token);
+    const expiresAt = new Date(Date.now() + 8 * 60 * 60 * 1000); // 8 hours
+
+    await db("admin_sessions").insert({
+      admin_id: admin.id,
+      token_hash: tokenHash,
+      token_fingerprint: tokenFingerprint,
+      expires_at: expiresAt,
+      ip_address: ipAddress,
+      user_agent: userAgent,
+    });
+
+    // sign JWT
+    const jwtToken = jwt.sign(
+      {
+        sub: admin.id,
+        role: admin.role,
+        email: admin.email,
+        sid: tokenFingerprint, // session ID for revocation
+      },
+      env.ADMIN_JWT_SECRET,
+      { algorithm: "HS256", expiresIn: "8h" },
+    );
+
+    await auditLog({
+      event_type: "ADMIN_LOGIN",
+      actor_id: admin.id,
+      actor_type: "admin",
+      ip_address: ipAddress,
+      payload: { email: admin.email, role: admin.role },
+    });
+
+    logger.info({ adminId: admin.id, role: admin.role }, "Admin logged in");
+
+    return {
+      token: jwtToken,
+      expiresIn: "8h",
+      admin: {
+        id: admin.id,
+        email: admin.email,
+        fullName: admin.full_name,
+        role: admin.role,
+      },
+    };
+  },
+
+  async logout(adminId, sessionFingerprint) {
+    await db("admin_sessions")
+      .where({ admin_id: adminId, token_fingerprint: sessionFingerprint })
+      .update({ is_revoked: true });
+
+    await auditLog({
+      event_type: "ADMIN_LOGOUT",
+      actor_id: adminId,
+      actor_type: "admin",
+    });
+
+    logger.info({ adminId }, "Admin logged out");
+  },
+
+  async getAdminProfile(adminId) {
+    const admin = await db("admins")
+      .where({ id: adminId })
+      .select("id", "email", "full_name", "role", "last_login_at", "created_at")
+      .first();
+    if (!admin) throw new AppError(ErrorCode.NOT_FOUND, 404);
+    return {
+      id: admin.id,
+      email: admin.email,
+      fullName: admin.full_name,
+      role: admin.role,
+      lastLoginAt: admin.last_login_at,
+      createdAt: admin.created_at,
     };
   },
 };
