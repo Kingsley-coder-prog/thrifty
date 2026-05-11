@@ -643,9 +643,6 @@ export const adminService = {
       user_agent: userAgent,
     });
 
-    // ADD THIS TEMPORARILY
-    logger.info({ tokenFingerprint, adminId: admin.id }, "Session inserted");
-
     // sign JWT
     const jwtToken = jwt.sign(
       {
