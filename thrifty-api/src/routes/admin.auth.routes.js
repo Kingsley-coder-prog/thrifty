@@ -23,11 +23,7 @@ const loginSchema = z.object({
  */
 adminAuthRouter.post(
   "/login",
-  rateLimiter({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    keyPrefix: "rl:admin:login",
-  }),
+  rateLimiter,
   validate(loginSchema),
   async (req, res, next) => {
     try {
