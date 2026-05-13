@@ -34,6 +34,9 @@ export const useAuthStore = defineStore("auth", () => {
         refreshToken: data.refreshToken,
       });
       user.value = data.user;
+      try {
+        await fetchProfile();
+      } catch {}
       return data;
     } finally {
       loading.value = false;
@@ -49,6 +52,9 @@ export const useAuthStore = defineStore("auth", () => {
         refreshToken: data.refreshToken,
       });
       user.value = data.user;
+      try {
+        await fetchProfile();
+      } catch {}
       return data;
     } finally {
       loading.value = false;
@@ -75,6 +81,16 @@ export const useAuthStore = defineStore("auth", () => {
     return data.user;
   }
 
+  async function init() {
+    if (accessToken.value) {
+      try {
+        await fetchProfile();
+      } catch {
+        clearTokens();
+      }
+    }
+  }
+
   return {
     user,
     accessToken,
@@ -85,5 +101,6 @@ export const useAuthStore = defineStore("auth", () => {
     login,
     logout,
     fetchProfile,
+    init,
   };
 });
