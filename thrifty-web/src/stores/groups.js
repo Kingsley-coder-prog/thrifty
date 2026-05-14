@@ -24,11 +24,17 @@ export const useGroupsStore = defineStore("groups", () => {
     return data.tiers;
   }
 
+  async function joinGroup(tierId, pin) {
+    const { data } = await groupsApi.joinGroup(tierId, pin);
+    return data;
+  }
+
   return {
     myGroups,
     tiers,
     loading,
     fetchMyGroups,
     fetchTiers,
+    joinGroup,
   };
 });
