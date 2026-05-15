@@ -19,7 +19,7 @@
             type="tel"
             placeholder="08012345678"
             :disabled="loading"
-            autocomplete="tel"
+            autocomplete="new-tel"
           />
         </div>
 
@@ -40,7 +40,7 @@
               :type="showPassword ? 'text' : 'password'"
               placeholder="Enter your password"
               :disabled="loading"
-              autocomplete="current-password"
+              autocomplete="new-password"
               class="pr-10"
             />
             <button

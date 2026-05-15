@@ -146,9 +146,12 @@ const pageTitles = {
   "/profile": "Profile",
 };
 
-const currentPageTitle = computed(
-  () => pageTitles[currentRoute.path] ?? "Thrifty"
-);
+const currentPageTitle = computed(() => {
+  if (currentRoute.path.startsWith("/groups/") && currentRoute.params.id) {
+    return "Group Detail";
+  }
+  return pageTitles[currentRoute.path] ?? "Thrifty";
+});
 
 const userName = computed(() => authStore.user?.fullName ?? "User");
 

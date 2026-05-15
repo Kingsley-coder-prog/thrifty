@@ -26,4 +26,8 @@ export const groupsApi = {
       },
     );
   },
+
+  leaveGroup(groupId) {
+    return api.delete(`/groups/${groupId}/leave`);
+  },
 };
