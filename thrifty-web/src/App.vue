@@ -10,12 +10,15 @@ import { computed, onMounted } from "vue";
 import { useRoute, RouterView } from "vue-router";
 import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuthStore } from "./stores/auth";
+import { useTheme } from "./composables/useTheme";
 
 const route = useRoute();
 const authStore = useAuthStore();
+const { initTheme } = useTheme();
 const isAppRoute = computed(() => route.meta.requiresAuth);
 
 onMounted(() => {
   authStore.init();
+  initTheme();
 });
 </script>

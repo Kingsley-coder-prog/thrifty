@@ -173,6 +173,29 @@
           </div>
           <Button variant="outline" size="sm">Change</Button>
         </div>
+        <!-- App Preferences card -->
+        <div class="bg-white rounded-xl border border-border p-6 space-y-4">
+          <h3 class="font-semibold text-foreground">Preferences</h3>
+
+          <div class="flex items-center justify-between py-3">
+            <div>
+              <p class="text-sm font-medium text-foreground">Dark Mode</p>
+              <p class="text-xs text-muted-foreground">
+                Switch between light and dark theme
+              </p>
+            </div>
+            <button
+              @click="toggleTheme"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+              :class="isDark ? 'bg-primary' : 'bg-zinc-200'"
+            >
+              <span
+                class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                :class="isDark ? 'translate-x-6' : 'translate-x-1'"
+              />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -282,6 +305,48 @@
       </DialogFooter>
     </DialogContent>
   </Dialog>
+
+  <!-- PIN dialog -->
+  <Dialog v-model:open="pinDialogOpen">
+    <DialogContent class="max-w-sm">
+      <DialogHeader>
+        <DialogTitle>Enter Transaction PIN</DialogTitle>
+        <DialogDescription>
+          Enter your 6-digit PIN to confirm this action.
+        </DialogDescription>
+      </DialogHeader>
+      <div class="space-y-4 py-2">
+        <div class="space-y-2">
+          <Label for="confirm-pin">Transaction PIN</Label>
+          <Input
+            id="confirm-pin"
+            v-model="pin"
+            type="password"
+            placeholder="6-digit PIN"
+            maxlength="6"
+            inputmode="numeric"
+            autofocus
+          />
+        </div>
+        <div
+          v-if="pinError"
+          class="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg"
+        >
+          {{ pinError }}
+        </div>
+      </div>
+      <DialogFooter>
+        <Button variant="outline" @click="cancelPin">Cancel</Button>
+        <Button
+          class="bg-primary hover:bg-primary/90"
+          :disabled="pin.length !== 6"
+          @click="confirmPin"
+        >
+          Confirm
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup>
@@ -311,6 +376,9 @@ import {
 } from "@/components/ui/dialog";
 import { useAuthStore } from "@/stores/auth";
 import { usersApi } from "@/api/users";
+import { usePinDialog } from "@/composables/usePinDialog";
+import { useTheme } from "@/composables/useTheme";
+const { isDark, toggleTheme } = useTheme();
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -329,6 +397,9 @@ const bankForm = ref({
   accountNumber: "",
   pin: "",
 });
+
+const { pinDialogOpen, pin, pinError, requestPin, confirmPin, cancelPin } =
+  usePinDialog();
 
 const bankFormValid = computed(
   () =>
@@ -411,11 +482,11 @@ async function handleAddBank() {
 
 async function handleSetPrimary(accountId) {
   try {
-    const pin = prompt("Enter your transaction PIN");
-    if (!pin) return;
-    await usersApi.setPrimaryAccount(accountId, pin);
+    const enteredPin = await requestPin();
+    await usersApi.setPrimaryAccount(accountId, enteredPin);
     await loadBankAccounts();
   } catch (err) {
+    if (err.message === "PIN_CANCELLED") return;
     alert(
       err.response?.data?.meta?.message ?? "Failed to update primary account"
     );
@@ -425,11 +496,11 @@ async function handleSetPrimary(accountId) {
 async function handleRemoveAccount(accountId) {
   if (!confirm("Remove this bank account?")) return;
   try {
-    const pin = prompt("Enter your transaction PIN");
-    if (!pin) return;
-    await usersApi.removeAccount(accountId, pin);
+    const enteredPin = await requestPin();
+    await usersApi.removeAccount(accountId, enteredPin);
     await loadBankAccounts();
   } catch (err) {
+    if (err.message === "PIN_CANCELLED") return;
     alert(err.response?.data?.meta?.message ?? "Failed to remove account");
   }
 }
