@@ -9,7 +9,7 @@
     </div>
 
     <!-- Personal info card -->
-    <div class="bg-white rounded-xl border border-border p-6 space-y-5">
+    <div class="bg-card rounded-xl border border-border p-6 space-y-5">
       <div class="flex items-center justify-between">
         <h3 class="font-semibold text-foreground">Personal Information</h3>
         <Badge :class="kycBadgeClass" class="text-xs">
@@ -64,7 +64,7 @@
     </div>
 
     <!-- Bank accounts card -->
-    <div class="bg-white rounded-xl border border-border p-6 space-y-5">
+    <div class="bg-card rounded-xl border border-border p-6 space-y-5">
       <div class="flex items-center justify-between">
         <h3 class="font-semibold text-foreground">Bank Accounts</h3>
         <Button
@@ -104,7 +104,7 @@
         >
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center"
+              class="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center"
             >
               <Building2 class="w-5 h-5 text-zinc-500" />
             </div>
@@ -149,7 +149,7 @@
     </div>
 
     <!-- Security card -->
-    <div class="bg-white rounded-xl border border-border p-6 space-y-4">
+    <div class="bg-card rounded-xl border border-border p-6 space-y-4">
       <h3 class="font-semibold text-foreground">Security</h3>
 
       <div class="space-y-3">
@@ -162,7 +162,9 @@
               Change your login password
             </p>
           </div>
-          <Button variant="outline" size="sm">Change</Button>
+          <Button variant="outline" size="sm" @click="changePasswordOpen = true"
+            >Change</Button
+          >
         </div>
         <div class="flex items-center justify-between py-3">
           <div>
@@ -171,10 +173,12 @@
               Change your 6-digit transaction PIN
             </p>
           </div>
-          <Button variant="outline" size="sm">Change</Button>
+          <Button variant="outline" size="sm" @click="changePinOpen = true"
+            >Change</Button
+          >
         </div>
         <!-- App Preferences card -->
-        <div class="bg-white rounded-xl border border-border p-6 space-y-4">
+        <div class="bg-card rounded-xl border border-border p-6 space-y-4">
           <h3 class="font-semibold text-foreground">Preferences</h3>
 
           <div class="flex items-center justify-between py-3">
@@ -190,7 +194,7 @@
               :class="isDark ? 'bg-primary' : 'bg-zinc-200'"
             >
               <span
-                class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                class="inline-block h-4 w-4 transform rounded-full bg-card shadow transition-transform"
                 :class="isDark ? 'translate-x-6' : 'translate-x-1'"
               />
             </button>
@@ -200,7 +204,7 @@
     </div>
 
     <!-- Danger zone -->
-    <div class="bg-white rounded-xl border border-destructive/20 p-6 space-y-4">
+    <div class="bg-card rounded-xl border border-destructive/20 p-6 space-y-4">
       <h3 class="font-semibold text-destructive">Danger Zone</h3>
       <div class="flex items-center justify-between">
         <div>
@@ -347,6 +351,162 @@
       </DialogFooter>
     </DialogContent>
   </Dialog>
+
+  <!-- Change Password dialog -->
+  <Dialog v-model:open="changePasswordOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Change Password</DialogTitle>
+        <DialogDescription>
+          Enter your current password and choose a new one.
+        </DialogDescription>
+      </DialogHeader>
+      <div class="space-y-4 py-2">
+        <div class="space-y-2">
+          <Label for="current-password">Current Password</Label>
+          <Input
+            id="current-password"
+            v-model="passwordForm.current"
+            type="password"
+            placeholder="Enter current password"
+            :disabled="changingPassword"
+          />
+        </div>
+        <div class="space-y-2">
+          <Label for="new-password">New Password</Label>
+          <Input
+            id="new-password"
+            v-model="passwordForm.new"
+            type="password"
+            placeholder="Min 8 characters"
+            :disabled="changingPassword"
+          />
+          <p class="text-xs text-muted-foreground">
+            Min 8 characters, must include uppercase, number and special
+            character
+          </p>
+        </div>
+        <div class="space-y-2">
+          <Label for="confirm-new-password">Confirm New Password</Label>
+          <Input
+            id="confirm-new-password"
+            v-model="passwordForm.confirm"
+            type="password"
+            placeholder="Repeat new password"
+            :disabled="changingPassword"
+          />
+        </div>
+        <div
+          v-if="passwordError"
+          class="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg"
+        >
+          {{ passwordError }}
+        </div>
+        <div
+          v-if="passwordSuccess"
+          class="text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg"
+        >
+          Password changed successfully.
+        </div>
+      </div>
+      <DialogFooter>
+        <Button
+          variant="outline"
+          @click="changePasswordOpen = false"
+          :disabled="changingPassword"
+        >
+          Cancel
+        </Button>
+        <Button
+          class="bg-primary hover:bg-primary/90"
+          :disabled="changingPassword || !passwordFormValid"
+          @click="handleChangePassword"
+        >
+          <Loader2 v-if="changingPassword" class="w-4 h-4 mr-2 animate-spin" />
+          {{ changingPassword ? "Changing..." : "Change Password" }}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+
+  <!-- Change PIN dialog -->
+  <Dialog v-model:open="changePinOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Change Transaction PIN</DialogTitle>
+        <DialogDescription>
+          Enter your current PIN and choose a new 6-digit PIN.
+        </DialogDescription>
+      </DialogHeader>
+      <div class="space-y-4 py-2">
+        <div class="space-y-2">
+          <Label for="current-pin">Current PIN</Label>
+          <Input
+            id="current-pin"
+            v-model="pinForm.current"
+            type="password"
+            placeholder="6-digit PIN"
+            maxlength="6"
+            inputmode="numeric"
+            :disabled="changingPin"
+          />
+        </div>
+        <div class="space-y-2">
+          <Label for="new-pin">New PIN</Label>
+          <Input
+            id="new-pin"
+            v-model="pinForm.new"
+            type="password"
+            placeholder="6-digit PIN"
+            maxlength="6"
+            inputmode="numeric"
+            :disabled="changingPin"
+          />
+        </div>
+        <div class="space-y-2">
+          <Label for="confirm-new-pin">Confirm New PIN</Label>
+          <Input
+            id="confirm-new-pin"
+            v-model="pinForm.confirm"
+            type="password"
+            placeholder="Repeat new PIN"
+            maxlength="6"
+            inputmode="numeric"
+            :disabled="changingPin"
+          />
+        </div>
+        <div
+          v-if="pinChangeError"
+          class="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg"
+        >
+          {{ pinChangeError }}
+        </div>
+        <div
+          v-if="pinChangeSuccess"
+          class="text-sm text-primary bg-primary/10 px-3 py-2 rounded-lg"
+        >
+          PIN changed successfully.
+        </div>
+      </div>
+      <DialogFooter>
+        <Button
+          variant="outline"
+          @click="changePinOpen = false"
+          :disabled="changingPin"
+        >
+          Cancel
+        </Button>
+        <Button
+          class="bg-primary hover:bg-primary/90"
+          :disabled="changingPin || !pinFormValid"
+          @click="handleChangePin"
+        >
+          <Loader2 v-if="changingPin" class="w-4 h-4 mr-2 animate-spin" />
+          {{ changingPin ? "Changing..." : "Change PIN" }}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup>
@@ -398,6 +558,34 @@ const bankForm = ref({
   pin: "",
 });
 
+// Change password
+const changePasswordOpen = ref(false);
+const changingPassword = ref(false);
+const passwordError = ref("");
+const passwordSuccess = ref(false);
+const passwordForm = ref({ current: "", new: "", confirm: "" });
+
+// Change PIN
+const changePinOpen = ref(false);
+const changingPin = ref(false);
+const pinChangeError = ref("");
+const pinChangeSuccess = ref(false);
+const pinForm = ref({ current: "", new: "", confirm: "" });
+
+const passwordFormValid = computed(
+  () =>
+    passwordForm.value.current &&
+    passwordForm.value.new.length >= 8 &&
+    passwordForm.value.new === passwordForm.value.confirm
+);
+
+const pinFormValid = computed(
+  () =>
+    pinForm.value.current.length === 6 &&
+    pinForm.value.new.length === 6 &&
+    pinForm.value.new === pinForm.value.confirm
+);
+
 const { pinDialogOpen, pin, pinError, requestPin, confirmPin, cancelPin } =
   usePinDialog();
 
@@ -442,8 +630,74 @@ const kycBadgeClass = computed(
       bvn_verified: "bg-green-100 text-green-700",
       pending: "bg-amber-100 text-amber-700",
       rejected: "bg-red-100 text-red-700",
-    }[user.value?.kycStatus] ?? "bg-zinc-100 text-zinc-700")
+    }[user.value?.kycStatus] ?? "bg-secondary text-zinc-700")
 );
+
+async function handleChangePassword() {
+  passwordError.value = "";
+  passwordSuccess.value = false;
+
+  if (passwordForm.value.new !== passwordForm.value.confirm) {
+    passwordError.value = "Passwords do not match";
+    return;
+  }
+
+  changingPassword.value = true;
+  try {
+    await usersApi.changePassword({
+      currentPassword: passwordForm.value.current,
+      newPassword: passwordForm.value.new,
+    });
+    passwordSuccess.value = true;
+    passwordForm.value = { current: "", new: "", confirm: "" };
+    setTimeout(() => {
+      changePasswordOpen.value = false;
+    }, 1500);
+  } catch (err) {
+    const code = err.response?.data?.error;
+    if (code === "INVALID_CREDENTIALS") {
+      passwordError.value = "Current password is incorrect.";
+    } else {
+      passwordError.value =
+        err.response?.data?.meta?.message ?? "Something went wrong.";
+    }
+  } finally {
+    changingPassword.value = false;
+  }
+}
+
+async function handleChangePin() {
+  pinChangeError.value = "";
+  pinChangeSuccess.value = false;
+
+  if (pinForm.value.new !== pinForm.value.confirm) {
+    pinChangeError.value = "PINs do not match";
+    return;
+  }
+
+  changingPin.value = true;
+  try {
+    await usersApi.changePin({
+      currentPin: pinForm.value.current,
+      newPin: pinForm.value.new,
+    });
+    pinChangeSuccess.value = true;
+    pinForm.value = { current: "", new: "", confirm: "" };
+    setTimeout(() => {
+      changePinOpen.value = false;
+    }, 1500);
+  } catch (err) {
+    const code = err.response?.data?.error;
+    if (code === "PIN_INVALID") {
+      pinChangeError.value = "Current PIN is incorrect.";
+    } else {
+      pinChangeError.value =
+        err.response?.data?.meta?.message ?? "Something went wrong.";
+    }
+  } finally {
+    changingPin.value = false;
+  }
+}
 
 function openAddBankDialog() {
   bankForm.value = { bankName: "", bankCode: "", accountNumber: "", pin: "" };

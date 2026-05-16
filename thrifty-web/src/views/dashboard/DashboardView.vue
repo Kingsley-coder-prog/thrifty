@@ -46,7 +46,7 @@
       <!-- No groups state -->
       <div
         v-if="myGroups.length === 0"
-        class="bg-white rounded-xl border border-border p-10 text-center"
+        class="bg-card rounded-xl border border-border p-10 text-center"
       >
         <div
           class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4"

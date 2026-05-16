@@ -17,7 +17,7 @@
 
     <template v-else-if="group">
       <!-- Group header card -->
-      <div class="bg-white rounded-xl border border-border p-6 space-y-5">
+      <div class="bg-card rounded-xl border border-border p-6 space-y-5">
         <div class="flex items-start justify-between gap-4">
           <div class="space-y-2">
             <div class="flex items-center gap-2">
@@ -89,7 +89,7 @@
             </span>
             <span v-else>Waiting for {{ 7 - group.memberCount }} more</span>
           </div>
-          <div class="h-2 bg-zinc-100 rounded-full overflow-hidden">
+          <div class="h-2 bg-secondary rounded-full overflow-hidden">
             <div
               class="h-full rounded-full transition-all"
               :class="
@@ -131,7 +131,7 @@
       </div>
 
       <!-- Members list -->
-      <div class="bg-white rounded-xl border border-border p-6 space-y-4">
+      <div class="bg-card rounded-xl border border-border p-6 space-y-4">
         <h3 class="font-semibold text-foreground">Members</h3>
 
         <div class="space-y-3">
@@ -143,7 +143,7 @@
             :class="
               member.isCurrentUser
                 ? 'bg-primary/5 border border-primary/20'
-                : 'bg-zinc-50'
+                : 'bg-background'
             "
           >
             <!-- Avatar -->
@@ -176,14 +176,14 @@
                 :class="
                   member.hasCollected
                     ? 'bg-green-100 text-green-700'
-                    : 'bg-zinc-100 text-zinc-600'
+                    : 'bg-secondary text-zinc-600'
                 "
               >
                 {{ member.turnPosition }}
               </div>
               <div
                 v-else
-                class="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center"
+                class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center"
               >
                 <span class="text-xs text-zinc-400">—</span>
               </div>
@@ -200,7 +200,7 @@
             class="flex items-center gap-3 p-3 rounded-lg border border-dashed border-border"
           >
             <div
-              class="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center shrink-0"
+              class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center shrink-0"
             >
               <UserPlus class="w-4 h-4 text-zinc-400" />
             </div>
@@ -275,10 +275,10 @@ const tierBadgeClass = computed(
   () =>
     ({
       Bronze: "bg-amber-100 text-amber-700 hover:bg-amber-100",
-      Silver: "bg-zinc-100 text-zinc-700 hover:bg-zinc-100",
+      Silver: "bg-secondary text-zinc-700 hover:bg-secondary",
       Gold: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
       Platinum: "bg-purple-100 text-purple-700 hover:bg-purple-100",
-    }[group.value?.tierName] ?? "bg-zinc-100 text-zinc-700")
+    }[group.value?.tierName] ?? "bg-secondary text-zinc-700")
 );
 
 const statusBadgeClass = computed(
@@ -288,7 +288,7 @@ const statusBadgeClass = computed(
       active: "bg-green-100 text-green-700 hover:bg-green-100",
       completed: "bg-blue-100 text-blue-700 hover:bg-blue-100",
       frozen: "bg-red-100 text-red-700 hover:bg-red-100",
-    }[group.value?.status] ?? "bg-zinc-100 text-zinc-700")
+    }[group.value?.status] ?? "bg-secondary text-zinc-700")
 );
 
 const estimatedCollectionDate = computed(() => {

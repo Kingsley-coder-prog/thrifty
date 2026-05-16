@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-xl border border-border p-5 cursor-pointer hover:border-primary/30 hover:shadow-sm transition-all"
+    class="bg-card rounded-xl border border-border p-5 cursor-pointer hover:border-primary/30 hover:shadow-sm transition-all"
     @click="$emit('click')"
   >
     <div class="flex items-start justify-between gap-4">
@@ -40,7 +40,7 @@
         </div>
         <div v-else class="text-center">
           <div
-            class="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center mx-auto"
+            class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mx-auto"
           >
             <Users class="w-5 h-5 text-zinc-400" />
           </div>
@@ -57,7 +57,7 @@
         <span>Cycle {{ group.currentCycle }} of 7</span>
         <span>{{ group.memberCount }}/7 members</span>
       </div>
-      <div class="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+      <div class="h-1.5 bg-secondary rounded-full overflow-hidden">
         <div
           class="h-full bg-primary rounded-full transition-all"
           :style="{ width: `${(group.currentCycle / 7) * 100}%` }"
@@ -73,7 +73,7 @@
         <span>Waiting for members</span>
         <span>{{ group.memberCount }}/7</span>
       </div>
-      <div class="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+      <div class="h-1.5 bg-secondary rounded-full overflow-hidden">
         <div
           class="h-full bg-amber-400 rounded-full transition-all"
           :style="{ width: `${(group.memberCount / 7) * 100}%` }"
@@ -113,10 +113,10 @@ const tierBadgeClass = computed(
   () =>
     ({
       Bronze: "bg-amber-100 text-amber-700 hover:bg-amber-100",
-      Silver: "bg-zinc-100 text-zinc-700 hover:bg-zinc-100",
+      Silver: "bg-secondary text-zinc-700 hover:bg-secondary",
       Gold: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
       Platinum: "bg-purple-100 text-purple-700 hover:bg-purple-100",
-    }[props.group.tier?.name] ?? "bg-zinc-100 text-zinc-700")
+    }[props.group.tier?.name] ?? "bg-secondary text-zinc-700")
 );
 
 const statusBadgeClass = computed(
@@ -126,6 +126,6 @@ const statusBadgeClass = computed(
       active: "bg-green-100 text-green-700 hover:bg-green-100",
       completed: "bg-blue-100 text-blue-700 hover:bg-blue-100",
       frozen: "bg-red-100 text-red-700 hover:bg-red-100",
-    }[props.group.status] ?? "bg-zinc-100 text-zinc-700")
+    }[props.group.status] ?? "bg-secondary text-zinc-700")
 );
 </script>

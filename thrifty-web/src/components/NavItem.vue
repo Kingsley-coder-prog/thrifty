@@ -5,7 +5,7 @@
     :class="
       isActive
         ? 'bg-primary/10 text-primary'
-        : 'text-muted-foreground hover:bg-zinc-100 hover:text-foreground'
+        : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
     "
   >
     <component :is="item.icon" class="w-5 h-5 shrink-0" />

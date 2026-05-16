@@ -34,4 +34,12 @@ export const usersApi = {
       headers: { "X-Transaction-Pin": pin },
     });
   },
+
+  changePassword(payload) {
+    return api.patch("/auth/change-password", payload);
+  },
+
+  changePin(payload) {
+    return api.patch("/users/me/pin", payload);
+  },
 };

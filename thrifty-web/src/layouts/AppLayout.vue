@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-zinc-50 flex">
+  <div class="min-h-screen bg-background flex">
     <!-- Sidebar — desktop only -->
     <aside
-      class="hidden lg:flex flex-col w-64 bg-white border-r border-border fixed inset-y-0 left-0 z-30"
+      class="hidden lg:flex flex-col w-64 bg-card border-r border-border fixed inset-y-0 left-0 z-30"
     >
       <!-- Logo -->
       <div class="h-16 flex items-center px-6 border-b border-border">
@@ -45,7 +45,7 @@
     <div class="flex-1 lg:ml-64 flex flex-col min-h-screen">
       <!-- Top header -->
       <header
-        class="h-16 bg-white border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20"
+        class="h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-20"
       >
         <!-- Mobile: logo -->
         <div class="lg:hidden">
@@ -90,7 +90,7 @@
 
     <!-- Bottom tab bar — mobile only -->
     <nav
-      class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-border z-30 flex"
+      class="lg:hidden fixed bottom-0 inset-x-0 bg-card border-t border-border z-30 flex"
     >
       <RouterLink
         v-for="item in mobileNavItems"

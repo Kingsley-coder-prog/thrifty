@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-xl border border-border p-5">
+  <div class="bg-card rounded-xl border border-border p-5">
     <div class="flex items-center justify-between mb-4">
       <p class="text-sm font-medium text-muted-foreground">{{ label }}</p>
       <div

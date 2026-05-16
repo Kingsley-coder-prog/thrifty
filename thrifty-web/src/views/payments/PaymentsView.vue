@@ -10,7 +10,7 @@
 
     <!-- Summary cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div class="bg-white rounded-xl border border-border p-5">
+      <div class="bg-card rounded-xl border border-border p-5">
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-medium text-muted-foreground">
             Total Contributed
@@ -32,7 +32,7 @@
         </p>
       </div>
 
-      <div class="bg-white rounded-xl border border-border p-5">
+      <div class="bg-card rounded-xl border border-border p-5">
         <div class="flex items-center justify-between mb-4">
           <p class="text-sm font-medium text-muted-foreground">
             Total Received
@@ -47,9 +47,7 @@
           {{ formatNaira(totalReceived) }}
         </p>
         <p class="text-xs text-muted-foreground mt-1">
-          {{ completedPayouts }} payout{{
-            completedPayouts !== 1 ? "s" : ""
-          }}
+          {{ completedPayouts }} payout{{ completedPayouts !== 1 ? "s" : "" }}
           received
         </p>
       </div>
@@ -70,10 +68,10 @@
 
         <div
           v-else-if="contributions.length === 0"
-          class="text-center py-16 bg-white rounded-xl border border-border"
+          class="text-center py-16 bg-card rounded-xl border border-border"
         >
           <div
-            class="w-14 h-14 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            class="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4"
           >
             <Receipt class="w-6 h-6 text-zinc-400" />
           </div>
@@ -88,7 +86,7 @@
           <div
             v-for="contribution in contributions"
             :key="contribution.id"
-            class="bg-white rounded-xl border border-border p-4 flex items-center gap-4"
+            class="bg-card rounded-xl border border-border p-4 flex items-center gap-4"
           >
             <!-- Status icon -->
             <div
@@ -142,10 +140,10 @@
 
         <div
           v-else-if="payouts.length === 0"
-          class="text-center py-16 bg-white rounded-xl border border-border"
+          class="text-center py-16 bg-card rounded-xl border border-border"
         >
           <div
-            class="w-14 h-14 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4"
+            class="w-14 h-14 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4"
           >
             <Banknote class="w-6 h-6 text-zinc-400" />
           </div>
@@ -159,7 +157,7 @@
           <div
             v-for="payout in payouts"
             :key="payout.id"
-            class="bg-white rounded-xl border border-border p-4 flex items-center gap-4"
+            class="bg-card rounded-xl border border-border p-4 flex items-center gap-4"
           >
             <!-- Icon -->
             <div
@@ -264,7 +262,7 @@ function contributionIconBg(status) {
       paid: "bg-green-50",
       pending: "bg-amber-50",
       failed: "bg-red-50",
-    }[status] ?? "bg-zinc-100"
+    }[status] ?? "bg-secondary"
   );
 }
 
@@ -274,7 +272,7 @@ function contributionBadgeClass(status) {
       paid: "bg-green-100 text-green-700 hover:bg-green-100",
       pending: "bg-amber-100 text-amber-700 hover:bg-amber-100",
       failed: "bg-red-100 text-red-700 hover:bg-red-100",
-    }[status] ?? "bg-zinc-100 text-zinc-700"
+    }[status] ?? "bg-secondary text-zinc-700"
   );
 }
 

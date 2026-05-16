@@ -1,7 +1,7 @@
 <template>
   <AuthLayout>
     <div
-      class="bg-white/85 backdrop-blur-sm rounded-2xl p-8 border border-green-100 shadow-sm"
+      class="bg-card/85 backdrop-blur-sm rounded-2xl p-8 border border-green-100 shadow-sm"
     >
       <div class="mb-8">
         <RouterLink

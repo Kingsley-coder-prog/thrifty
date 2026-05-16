@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-xl border border-border p-6 flex flex-col gap-4 hover:border-primary/30 hover:shadow-sm transition-all"
+    class="bg-card rounded-xl border border-border p-6 flex flex-col gap-4 hover:border-primary/30 hover:shadow-sm transition-all"
   >
     <!-- Tier header -->
     <div class="flex items-center justify-between">
@@ -84,9 +84,9 @@ const tierBadgeClass = computed(
   () =>
     ({
       Bronze: "bg-amber-100 text-amber-700 hover:bg-amber-100",
-      Silver: "bg-zinc-100 text-zinc-700 hover:bg-zinc-100",
+      Silver: "bg-secondary text-zinc-700 hover:bg-secondary",
       Gold: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100",
       Platinum: "bg-purple-100 text-purple-700 hover:bg-purple-100",
-    }[props.tier.name] ?? "bg-zinc-100 text-zinc-700")
+    }[props.tier.name] ?? "bg-secondary text-zinc-700")
 );
 </script>
