@@ -507,6 +507,30 @@
       </DialogFooter>
     </DialogContent>
   </Dialog>
+
+  <!-- Confirm remove bank account dialog -->
+  <Dialog v-model:open="confirmRemoveOpen">
+    <DialogContent class="max-w-sm">
+      <DialogHeader>
+        <DialogTitle>Remove Bank Account</DialogTitle>
+        <DialogDescription>
+          Are you sure you want to remove this bank account? This action cannot
+          be undone.
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <Button variant="outline" @click="confirmRemoveOpen = false">
+          Cancel
+        </Button>
+        <Button
+          class="bg-destructive hover:bg-destructive/90 text-white"
+          @click="confirmRemove"
+        >
+          Remove
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup>
@@ -571,6 +595,9 @@ const changingPin = ref(false);
 const pinChangeError = ref("");
 const pinChangeSuccess = ref(false);
 const pinForm = ref({ current: "", new: "", confirm: "" });
+
+const confirmRemoveOpen = ref(false);
+const accountToRemove = ref(null);
 
 const passwordFormValid = computed(
   () =>
@@ -747,8 +774,12 @@ async function handleSetPrimary(accountId) {
   }
 }
 
-async function handleRemoveAccount(accountId) {
-  if (!confirm("Remove this bank account?")) return;
+function handleRemoveAccount(accountId) {
+  accountToRemove.value = accountId;
+  confirmRemoveOpen.value = true;
+}
+
+async function proceedRemoveAccount(accountId) {
   try {
     const enteredPin = await requestPin();
     await usersApi.removeAccount(accountId, enteredPin);
@@ -757,6 +788,11 @@ async function handleRemoveAccount(accountId) {
     if (err.message === "PIN_CANCELLED") return;
     alert(err.response?.data?.meta?.message ?? "Failed to remove account");
   }
+}
+
+function confirmRemove() {
+  confirmRemoveOpen.value = false;
+  proceedRemoveAccount(accountToRemove.value);
 }
 
 async function loadBankAccounts() {
