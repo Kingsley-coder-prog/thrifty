@@ -1,0 +1,10 @@
+export function useCurrency() {
+  function formatNaira(amount) {
+    if (!amount && amount !== 0) return "—";
+    const num = parseFloat(amount);
+    if (isNaN(num)) return "—";
+    return `₦${num.toLocaleString("en-NG", { minimumFractionDigits: 0 })}`;
+  }
+
+  return { formatNaira };
+}
