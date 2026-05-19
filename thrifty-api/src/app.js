@@ -10,6 +10,7 @@ import { groupRouter } from "./routes/group.routes.js";
 import { webhookRouter } from "./routes/webhook.routes.js";
 import { adminRouter } from "./routes/admin.routes.js";
 import { adminAuthRouter } from "./routes/admin.auth.routes.js";
+import { setupSwagger } from "./config/swagger.setup.js";
 
 export function createApp() {
   const app = express();
@@ -64,6 +65,8 @@ export function createApp() {
   app.use("/groups", groupRouter);
   app.use("/admin/auth", adminAuthRouter); // public — no adminAuth middleware
   app.use("/admin", adminRouter); // protected — adminAuth applied in router
+
+  setupSwagger(app);
 
   app.use((req, res) => {
     res.status(404).json({ error: "NOT_FOUND" });
