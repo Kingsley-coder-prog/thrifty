@@ -11,7 +11,7 @@ Thrifty digitises the traditional Nigerian rotating savings system (ajo/esusu) w
 | App           | URL                                                                        |
 | ------------- | -------------------------------------------------------------------------- |
 | User web app  | [thrifty-alpha.vercel.app](https://thrifty-alpha.vercel.app)               |
-| Admin console | [thrifty-admin.vercel.app](https://thrifty-admin-nu.vercel.app)               |
+| Admin console | [thrifty-admin-nu.vercel.app](https://thrifty-admin-nu.vercel.app)         |
 | API server    | [thrifty-api-server.onrender.com](https://thrifty-api-server.onrender.com) |
 
 ---
