@@ -1,0 +1,15 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Thrifty Logo</title>
+  <desc>Thrifty cooperative savings app logo — three interlocking rings in green with wordmark</desc>
+
+  <!-- Three interlocking rings -->
+  <!-- Top ring -->
+  <circle cx="24" cy="20" r="12" fill="none" stroke="#166534" stroke-width="3.5"/>
+  <!-- Bottom left ring -->
+  <circle cx="16" cy="36" r="12" fill="none" stroke="#16a34a" stroke-width="3.5"/>
+  <!-- Bottom right ring -->
+  <circle cx="32" cy="36" r="12" fill="none" stroke="#15803d" stroke-width="3.5"/>
+
+  <!-- Wordmark -->
+  <text x="54" y="34" font-family="Inter, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#18181b" letter-spacing="-0.5">Thrifty</text>
+</svg>

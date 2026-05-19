@@ -7,9 +7,9 @@
       <!-- Logo -->
       <div class="h-16 flex items-center px-6 border-b border-border gap-3">
         <div
-          class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0"
+          class="w-8 h-8 bg-primary dark:bg-secondary rounded-lg flex items-center justify-center shrink-0"
         >
-          <Shield class="w-4 h-4 text-white" />
+          <Shield class="w-4 h-4 text-primary-foreground" />
         </div>
         <div>
           <p class="font-bold text-foreground text-sm leading-none">
@@ -68,6 +68,15 @@
               {{ adminEmail }}
             </p>
           </div>
+          <!-- Dark mode toggle -->
+          <button
+            @click="toggleTheme"
+            class="text-muted-foreground hover:text-foreground transition-colors"
+            :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <Sun v-if="isDark" class="w-4 h-4 text-amber-400" />
+            <Moon v-else class="w-4 h-4" />
+          </button>
           <button
             @click="handleLogout"
             class="text-muted-foreground hover:text-destructive transition-colors"
@@ -94,6 +103,15 @@
 
         <!-- Right side -->
         <div class="flex items-center gap-3">
+          <!-- Mobile dark mode toggle -->
+          <button
+            @click="toggleTheme"
+            class="lg:hidden text-muted-foreground hover:text-foreground transition-colors p-1"
+            :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <Sun v-if="isDark" class="w-4 h-4 text-amber-400" />
+            <Moon v-else class="w-4 h-4" />
+          </button>
           <Badge
             class="bg-primary/10 text-primary border border-primary/20 text-xs hover:bg-primary hover:text-white transition-colors cursor-default"
           >
@@ -124,14 +142,18 @@ import {
   ScrollText,
   Shield,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-vue-next";
 import { Badge } from "@/components/ui/badge";
 import NavItem from "@/components/NavItem.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useTheme } from "@/composables/useTheme";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const { isDark, toggleTheme } = useTheme();
 
 const overviewNav = [
   { name: "Dashboard", to: "/dashboard", icon: LayoutDashboard },

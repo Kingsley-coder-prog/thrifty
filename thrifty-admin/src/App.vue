@@ -10,6 +10,8 @@ import { computed, onMounted } from "vue";
 import { useRoute, RouterView } from "vue-router";
 import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuthStore } from "@/stores/auth";
+import { useTheme } from "@/composables/useTheme";
+useTheme();
 
 const route = useRoute();
 const authStore = useAuthStore();
