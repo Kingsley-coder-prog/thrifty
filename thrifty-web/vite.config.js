@@ -14,10 +14,10 @@ export default defineConfig({
         "icons/icon-512.png",
       ],
       manifest: {
-        name: "Thrifty — Save Together",
+        name: "Thrifty - Save Together",
         short_name: "Thrifty",
         description:
-          "Digital cooperative savings — ajo and esusu for the modern era",
+          "Digital cooperative savings - ajo and esusu for the modern era",
         theme_color: "#166534",
         background_color: "#ffffff",
         display: "standalone",
