@@ -8,6 +8,7 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: "autoUpdate",
+      manifestFilename: "manifest.webmanifest",
       includeAssets: [
         "favicon.svg",
         "icons/icon-192.png",
