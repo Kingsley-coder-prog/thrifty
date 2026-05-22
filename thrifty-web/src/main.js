@@ -8,6 +8,7 @@ import router from "./router";
 // create the Vue application instance
 const app = createApp(App);
 
+// use Pinia and Vue Router in the application
 app.use(createPinia());
 app.use(router);
 
