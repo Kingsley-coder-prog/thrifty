@@ -12,4 +12,5 @@ const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 
+// mount the application to the DOM element with id "app"
 app.mount("#app");
