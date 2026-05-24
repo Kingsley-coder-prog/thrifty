@@ -17,6 +17,7 @@ const authStore = useAuthStore();
 const { initTheme } = useTheme();
 const isAppRoute = computed(() => route.meta.requiresAuth);
 
+// initialize authentication and theme settings when the component is mounted
 onMounted(() => {
   authStore.init();
   initTheme();
