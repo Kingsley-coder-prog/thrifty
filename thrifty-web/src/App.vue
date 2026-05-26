@@ -6,6 +6,7 @@
 </template>
 
 <script setup>
+// import necessary modules and components
 import { computed, onMounted } from "vue";
 import { useRoute, RouterView } from "vue-router";
 import AppLayout from "@/layouts/AppLayout.vue";
