@@ -13,6 +13,7 @@ import AppLayout from "@/layouts/AppLayout.vue";
 import { useAuthStore } from "./stores/auth";
 import { useTheme } from "./composables/useTheme";
 
+// get the current route and authentication store, and initialize theme settings
 const route = useRoute();
 const authStore = useAuthStore();
 const { initTheme } = useTheme();
